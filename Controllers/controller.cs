@@ -14,6 +14,29 @@ public class PdfController : ControllerBase
     public PdfController(ILogger<PdfController> logger)
     {
         _logger = logger;
+
+    }
+
+    public static List<string> CharacterTextSplitter(
+        string text,
+        int chunkSize,
+        int chunkOverlap,
+        string separator = "\n"
+    )
+    {
+        List<string> chunks = new List<string>();
+        int startIndex = 0;
+
+        while (startIndex < text.Length)
+        {
+            int endIndex = Math.Min(startIndex + chunkSize, text.Length);
+            string chunk = text.Substring(startIndex, endIndex - startIndex);
+            chunks.Add(chunk);
+
+            startIndex += chunkSize - chunkOverlap;
+        }
+
+        return chunks;
     }
 
     [HttpPost]
@@ -35,8 +58,17 @@ public class PdfController : ControllerBase
             var textFromPage = PdfTextExtractor.GetTextFromPage(page, textListener);
             text += textFromPage;
         }
-        _logger.LogInformation(text);
+        // _logger.LogInformation(text);
+        List<string> chunks = CharacterTextSplitter(text, 1000, 200);
+        int chunkNum=0;
+        foreach (string chunk in chunks)
+        {
+            Console.WriteLine("-----chunk "+chunkNum.ToString()+" ------------");
+            Console.WriteLine(chunk);
+            chunkNum++;
+        }
         return true;
+
         // Handle PDF file upload and processing as described in the previous answers
     }
 }
