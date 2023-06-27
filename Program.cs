@@ -1,9 +1,23 @@
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.SemanticFunctions;
+using Microsoft.SemanticKernel.Orchestration;
+using Microsoft.SemanticKernel.Memory;
+
 var builder = WebApplication.CreateBuilder(args);
+var kernelBuilder = new KernelBuilder();
 
 // Add services to the container.
 
+
 builder.Services.AddControllersWithViews();
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+var apiKey=builder.Configuration["api-key"];
+//semantic kernel config
+kernelBuilder.WithOpenAITextEmbeddingGenerationService("text-embedding-ada-002",apiKey);
+kernelBuilder.WithOpenAITextCompletionService("davinci",apiKey);
+kernelBuilder.WithMemoryStorage(new VolatileMemoryStore());
+var kernel=kernelBuilder.Build();
+//cors
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
@@ -22,6 +36,7 @@ builder.Services.AddCors(options =>
         }
     );
 });
+builder.Services.AddSingleton(kernel);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -2,7 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
-
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.SemanticFunctions;
+using Microsoft.SemanticKernel.Orchestration;
+using Microsoft.SemanticKernel.Memory;
 namespace langchainPDF.Controllers;
 
 [ApiController]
@@ -10,10 +13,11 @@ namespace langchainPDF.Controllers;
 public class PdfController : ControllerBase
 {
     private readonly ILogger<PdfController> _logger;
-
-    public PdfController(ILogger<PdfController> logger)
+    private IKernel _kernel;
+    public PdfController(ILogger<PdfController> logger,IKernel kernel)
     {
         _logger = logger;
+        _kernel=kernel;
 
     }
 
@@ -67,6 +71,7 @@ public class PdfController : ControllerBase
             Console.WriteLine(chunk);
             chunkNum++;
         }
+        
         return true;
 
         // Handle PDF file upload and processing as described in the previous answers
