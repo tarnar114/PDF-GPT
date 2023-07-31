@@ -1,7 +1,12 @@
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.SemanticFunctions;
-using Microsoft.SemanticKernel.Orchestration;
+
+using Npgsql;
+using Pgvector.Npgsql;
 using Microsoft.SemanticKernel.Memory;
+using Microsoft.SemanticKernel.Connectors.Memory.Postgres;
+using Microsoft.SemanticKernel.Skills.Core;
+using Microsoft.SemanticKernel.TemplateEngine;
+using Microsoft.SemanticKernel.AI.ChatCompletion;
 
 var builder = WebApplication.CreateBuilder(args);
 var kernelBuilder = new KernelBuilder();
@@ -11,13 +16,20 @@ var kernelBuilder = new KernelBuilder();
 
 builder.Services.AddControllersWithViews();
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-var apiKey=builder.Configuration["api-key"];
+var apiKey = builder.Configuration["OPENAI-KEY"];
 //semantic kernel config
-kernelBuilder.WithOpenAITextEmbeddingGenerationService("text-embedding-ada-002",apiKey);
-kernelBuilder.WithOpenAITextCompletionService("davinci",apiKey);
+
+kernelBuilder.WithOpenAITextEmbeddingGenerationService("text-embedding-ada-002", apiKey);
+kernelBuilder.WithOpenAIChatCompletionService("gpt-3.5-turbo", apiKey);
+
 kernelBuilder.WithMemoryStorage(new VolatileMemoryStore());
-var kernel=kernelBuilder.Build();
+
+IKernel kernel=kernelBuilder.Build();
 //cors
+var context=kernel.CreateNewContext();
+var promptRenderer=new PromptTemplateEngine();
+var chatGPT=kernel.GetService<IChatCompletion>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
@@ -33,10 +45,15 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowAnyOrigin();
+                
         }
     );
 });
 builder.Services.AddSingleton(kernel);
+// builder.Services.AddSingleton(memStore);
+builder.Services.AddSingleton(context);
+builder.Services.AddSingleton(promptRenderer);
+builder.Services.AddSingleton(chatGPT);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -52,7 +69,7 @@ app.UseRouting();
 app.UseCors(MyAllowSpecificOrigins);
 
 app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
-
+// app.MapControllers();
 app.MapFallbackToFile("index.html");
 
 app.Run();

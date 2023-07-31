@@ -1,24 +1,24 @@
-import { Box ,ChakraBaseProvider,Flex,Text} from '@chakra-ui/react';
-import React, { Component } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
-import Toggle from './theming/Toggle';
-import Chatbox from './components/Chatbox';
+import { Box, ChakraBaseProvider, Flex, Text } from "@chakra-ui/react";
+import React, { Component ,useEffect,useRef,useState} from "react";
+import { Route, Routes } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
+import Toggle from "./theming/Toggle";
+import Chatbox from "./components/Chatbox";
 
-
-export default class App extends Component {
-  static displayName = App.name;
-
-  render() {
+function App() {
+  // static displayName = App.name;
+  
+    const [file,setFile]=useState(null)
+    const [fileUploading,setFileUploading]=useState(false)
     return (
       <Box>
         <Flex>
-          <Sidebar/>
-          <Box w='100%'>
-            <Chatbox/>
+          <Sidebar file={file} setFile={setFile} setFileLoading={setFileUploading} />
+          <Box w="100%">
+            <Chatbox  file={file} />
           </Box>
-        </Flex> 
+        </Flex>
       </Box>
     );
   }
-}
+export default App;
