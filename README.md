@@ -44,5 +44,5 @@ simple questions about the contents of the pdf
 - Improve text chunking
 - Setup chat streaming completion
 - UI updates
-
+- Allow for user to chat with multiple files
 
