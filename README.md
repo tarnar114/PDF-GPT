@@ -24,7 +24,6 @@ git clone https://github.com/tarnar114/pdf-GPT/
   2. Navigate to the ClientApp directory and install the npm packages
 ```
 docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest
-
 ```
   3. Navigate to the ClientApp directory and install the npm packages
 ```
